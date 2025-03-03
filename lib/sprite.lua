@@ -16,12 +16,12 @@ function Sprite.new(x, y, img_path, cols, rows)
 
   local img_width = self.img:getWidth()
   local img_height = self.img:getHeight()
-  local col_width = math.floor(img_width / cols)
-  local row_height = math.floor(img_height / rows)
+  self.col_width = math.floor(img_width / cols)
+  self.row_height = math.floor(img_height / rows)
   local total_quads = cols * rows
   self.quads = {}
   for i = 0, total_quads - 1 do
-    self.quads[i] = love.graphics.newQuad((i % cols) * col_width, math.floor(i / cols) * row_height, col_width, row_height, img_width, img_height)
+    self.quads[i] = love.graphics.newQuad((i % cols) * self.col_width, math.floor(i / cols) * self.row_height, self.col_width, self.row_height, img_width, img_height)
   end
 
   return self
@@ -36,6 +36,10 @@ function Sprite:animate(indices, interval)
   end
 end
 
-function Sprite:draw()
-  love.graphics.draw(self.img, self.quads[self.img_index])
+function Sprite:draw(scale_x, scale_y, angle)
+  scale_x = scale_x or 1
+  scale_y = scale_y or 1
+  origin_x = 0.5 * self.col_width
+  origin_y = 0.5 * self.row_height
+  love.graphics.draw(self.img, self.quads[self.img_index], self.x + scale_x * origin_x, self.y + scale_y * origin_y, angle, scale_x, scale_y, origin_x, origin_y)
 end
