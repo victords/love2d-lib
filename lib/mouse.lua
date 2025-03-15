@@ -16,12 +16,12 @@ function Mouse.update()
   end
 end
 
-function Mouse.pressed(button_name)
-  return Mouse.cur_down[button_name] and not Mouse.prev_down[button_name]
-end
-
 function Mouse.down(button_name)
   return Mouse.cur_down[button_name]
+end
+
+function Mouse.pressed(button_name)
+  return Mouse.cur_down[button_name] and not Mouse.prev_down[button_name]
 end
 
 function Mouse.released(button_name)
