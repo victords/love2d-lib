@@ -4,6 +4,10 @@ function love.load()
   sprite = Sprite.new(50, 50, "data/img/attack4.png", 4, 2)
   angle = 0
   KB.held_delay = 120
+
+  local v = Vector.new(0, 0)
+  local w = Vector.new(3, 4)
+  print(v:distance(w))
 end
 
 function love.update(dt)
