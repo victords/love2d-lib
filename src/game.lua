@@ -5,9 +5,10 @@ function love.load()
   angle = 0
   KB.held_delay = 120
 
-  local v = Vector.new(0, 0)
-  local w = Vector.new(3, 4)
-  print(v:distance(w))
+  local r1 = Rectangle.new(1, 1, 10, 5)
+  local r2 = Rectangle.new(1, 6, 3, 3)
+  local r3 = Rectangle.new(3.99, 8.99, 3, 3)
+  print(r1:intersect(r2), r2:intersect(r3))
 end
 
 function love.update(dt)

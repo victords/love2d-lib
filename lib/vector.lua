@@ -2,10 +2,10 @@ Vector = {}
 Vector.__index = Vector
 
 function Vector.new(x, y)
-  local vector = setmetatable({}, Vector)
-  vector.x = x
-  vector.y = y
-  return vector
+  local self = setmetatable({}, Vector)
+  self.x = x
+  self.y = y
+  return self
 end
 
 function Vector.__add(self, other)

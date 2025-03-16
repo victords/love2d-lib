@@ -1,4 +1,5 @@
 require("lib.keyboard")
 require("lib.mouse")
+require("lib.rectangle")
 require("lib.sprite")
 require("lib.vector")
