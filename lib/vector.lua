@@ -25,7 +25,7 @@ function Vector.__div(self, value)
 end
 
 function Vector.__eq(self, other)
-  return self.x == other.x and self.y == other.y
+  return number.approx_equal(self.x, other.x) and number.approx_equal(self.y, other.y)
 end
 
 function Vector:distance(other)
