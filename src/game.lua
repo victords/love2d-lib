@@ -1,14 +1,9 @@
 require("lib.index")
 
 function love.load()
-  sprite = Sprite.new(50, 50, "data/img/attack4.png", 4, 2)
+  sprite = GameObject.new(0, 0, 5, 8, "data/img/attack4.png", Vector.new(-7, -3), 4, 2)
   angle = 0
   KB.held_delay = 120
-
-  local r1 = Rectangle.new(1, 1, 10, 5)
-  local r2 = Rectangle.new(1, 6, 3, 3)
-  local r3 = Rectangle.new(3.99, 8.99, 3, 3)
-  print(r1:intersect(r2), r2:intersect(r3))
 end
 
 function love.update(dt)
@@ -28,8 +23,10 @@ function love.update(dt)
 end
 
 function love.draw()
-  sprite:draw(1, 1, angle)
-  sprite.x = sprite.x + 14
+  love.graphics.setColor(255, 0, 0)
+  love.graphics.rectangle("fill", 0, 0, 100, 100)
+  love.graphics.setColor(0, 0, 255)
+  love.graphics.rectangle("fill", 0, 0, 50, 50)
+  love.graphics.setColor(255, 255, 255)
   sprite:draw(2, 2, angle)
-  sprite.x = sprite.x - 14
 end
