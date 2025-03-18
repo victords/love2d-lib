@@ -28,3 +28,252 @@ function GameObject:draw(scale_x, scale_y, angle, scale_img_gap)
   y = self.y + img_gap_scale_y * self.img_gap.y + scale_y * origin_y
   love.graphics.draw(self.img, self.quads[self.img_index], x, y, angle, scale_x, scale_y, origin_x, origin_y)
 end
+
+function GameObject:bounds()
+  return Rectangle.new(self.x, self.y, self.w, self.h)
+end
+
+function GameObject:move(forces, obst, ramps, set_speed)
+  local speed = self.speed
+  if set_speed then
+    speed.x = forces.x
+    speed.y = forces.y
+  else
+    forces = forces + Physics.gravity + self.stored_forces
+    self.stored_forces = Vector.new()
+
+    if (forces.x < 0 and self.left) or (forces.x > 0 and self.right) then forces.x = 0 end
+    if (forces.y < 0 and self.top) or (forces.y > 0 and self.bottom) then forces.y = 0 end
+
+    if getmetatable(self.bottom) == Ramp then
+      local threshold = Physics.ramp_slip_threshold
+      if self.bottom.ratio > threshold then
+        forces.x = forces.x + (self.bottom.left and -1 or 1) * (self.bottom.ratio - threshold) * Physics.ramp_slip_force / threshold
+      elseif forces.x > 0 and self.bottom.left or forces.x < 0 and not self.bottom.left then
+        forces.x = forces.x * self.bottom.factor
+      end
+    end
+
+    self.speed = speed + (forces / self.mass)
+    speed = self.speed
+  end
+
+  if math.abs(speed.x) < Physics.min_speed.x then speed.x = 0 end
+  if math.abs(speed.y) < Physics.min_speed.y then speed.y = 0 end
+  if math.abs(speed.x) > self.max_speed.x then speed.x = (speed.x < 0 and -1 or 1) * self.max_speed.x end
+  if math.abs(speed.y) > self.max_speed.y then speed.y = (speed.y < 0 and -1 or 1) * self.max_speed.y end
+  self.prev_speed = utils.clone(speed)
+
+  if speed.x == 0 and speed.y == 0 then return end
+
+  local x = speed.x < 0 and self.x + speed.x or self.x
+  local y = speed.y < 0 and self.y + speed.y or self.y
+  local w = self.w + math.abs(speed.x)
+  local h = self.h + math.abs(speed.y)
+  local move_bounds = Rectangle.new(x, y, w, h)
+  local coll_list = {}
+  for _, o in ipairs(obst) do
+    if o ~= self and move_bounds:intersect(o:bounds()) then table.insert(coll_list, o) end
+  end
+  for _, r in ipairs(ramps) do
+    r:check_can_collide(move_bounds)
+  end
+
+  if #coll_list > 0 then
+    local up = speed.y < 0
+    local rt = speed.x > 0
+    local dn = speed.y > 0
+    local lf = speed.x < 0
+    if speed.x == 0 or speed.y == 0 then
+      -- orthogonal movement
+      if rt then
+        local x_lim = self:find_right_limit(coll_list)
+        if self.x + self.w + speed.x > x_lim then
+          self.x = x_lim - self.w
+          speed.x = 0
+        end
+      elseif lf then
+        local x_lim = self:find_left_limit(coll_list)
+        if self.x + speed.x < x_lim then
+          self.x = x_lim
+          speed.x = 0
+        end
+      elseif dn then
+        local y_lim = self:find_down_limit(coll_list)
+        if self.y + self.h + speed.y > y_lim then
+          self.y = y_lim - self.h
+          speed.y = 0
+        end
+      else -- up
+        local y_lim = self:find_up_limit(coll_list)
+        if self.y + speed.y < y_lim then
+          self.y = y_lim
+          speed.y = 0
+        end
+      end
+    else
+      -- diagonal movement
+      x_aim = self.x + speed.x + (rt and self.w or 0)
+      x_lim_def = { x_aim, nil }
+      y_aim = self.y + speed.y + (dn and self.h or 0)
+      y_lim_def = { y_aim, nil }
+      for _, c in ipairs(coll_list) do
+        self:find_limits(c, x_aim, y_aim, x_lim_def, y_lim_def, up, rt, dn, lf)
+      end
+
+      if x_lim_def[1] ~= x_aim and y_lim_def[1] ~= y_aim then
+        x_time = (x_lim_def[1] - self.x - (lf and 0 or self.w)) / speed.x
+        y_time = (y_lim_def[1] - self.y - (up and 0 or self.h)) / speed.y
+        if x_time < y_time then
+          self:stop_at_x(x_lim_def[1], lf)
+          move_bounds = Rectangle.new(self.x, up and self.y + speed.y or self.y, self.w, self.h + math.abs(speed.y))
+          if move_bounds:intersect(y_lim_def[2]:bounds()) then self:stop_at_y(y_lim_def[1], up) end
+        else
+          self:stop_at_y(y_lim_def[1], up)
+          move_bounds = Rectangle.new(lf and self.x + speed.x or self.x, self.y, self.w + math.abs(speed.x), self.h)
+          if move_bounds:intersect(x_lim_def[2]:bounds()) then self:stop_at_x(x_lim_def[1], lf) end
+        end
+      elseif x_lim_def[1] ~= x_aim then
+        self:stop_at_x(x_lim_def[1], lf)
+      elseif y_lim_def[1] ~= y_aim then
+        self:stop_at_y(y_lim_def[1], up)
+      end
+    end
+  end
+  self.x = self.x + speed.x
+  self.y = self.y + speed.y
+
+  for _, r in ipairs(ramps) do
+    r:check_intersection(self)
+  end
+  self:check_contact(obst, ramps)
+end
+
+-- private
+function GameObject:check_contact(obst, ramps)
+  local prev_bottom = self.bottom
+  self.top = nil; self.bottom = nil; self.left = nil; self.right = nil
+  for _, o in ipairs(obst) do
+    local x2 = self.x + self.w
+    local y2 = self.y + self.h
+    local x2o = o.x + o.w
+    local y2o = o.y + o.h
+    if not o.passable and utils.approx_equal(x2, o.x) and y2 > o.y and self.y < y2o then self.right = o end
+    if not o.passable and utils.approx_equal(self.x, x2o) and y2 > o.y and self.y < y2o then self.left = o end
+    if utils.approx_equal(y2, o.y) and x2 > o.x and self.x < x2o then self.bottom = o end
+    if not o.passable and utils.approx_equal(self.y, y2o) and x2 > o.x and self.x < x2o then self.top = o end
+  end
+  if self.bottom == nil then
+    for _, r in ipairs(ramps) do
+      if r:contact(self) then
+        self.bottom = r
+        break
+      end
+    end
+    if self.bottom == nil then
+      for _, r in ipairs(ramps) do
+        if r == prev_bottom and
+           self.x + self.w > r.x and
+           r.x + r.w > self.x and
+           math.abs(self.prev_speed.x) <= Physics.ramp_contact_threshold and
+           self.prev_speed.y >= 0 then
+          self.y = r:get_y(self)
+          self.bottom = r
+          break
+        end
+      end
+    end
+  end
+end
+
+function GameObject:find_right_limit(coll_list)
+  local limit = self.x + self.w + self.speed.x
+  for _, c in ipairs(coll_list) do
+    if not c.passable and c.x < limit then limit = c.x end
+  end
+  return limit
+end
+
+function GameObject:find_left_limit(coll_list)
+  local limit = self.x + self.speed.x
+  for _, c in ipairs(coll_list) do
+    if not c.passable and c.x + c.w > limit then limit = c.x + c.w end
+  end
+  return limit
+end
+
+function GameObject:find_down_limit(coll_list)
+  local limit = self.y + self.h + self.speed.y
+  for _, c in ipairs(coll_list) do
+    if c.y < limit and (not c.passable or c.y >= self.y + self.h) then limit = c.y end
+  end
+  return limit
+end
+
+function GameObject:find_up_limit(coll_list)
+  local limit = self.y + self.speed.y
+  for _, c in ipairs(coll_list) do
+    if not c.passable and c.y + c.h > limit then limit = c.y + c.h end
+  end
+  return limit
+end
+
+function GameObject:find_limits(obj, x_aim, y_aim, x_lim_def, y_lim_def, up, rt, dn, lf)
+  local x_lim = obj.x + obj.w
+  if obj.passable then
+    x_lim = x_aim
+  elseif rt then
+    x_lim = obj.x
+  end
+
+  local y_lim = obj.y + obj.h
+  if dn then
+    y_lim = obj.y
+  elseif obj.passable then
+    y_lim = y_aim
+  end
+
+  local x_v = x_lim_def[1]
+  local y_v = y_lim_def[1]
+  if obj.passable then
+    if dn and self.y + self.h <= y_lim and y_lim < y_v then
+      y_lim_def[1] = y_lim
+      y_lim_def[2] = obj
+    end
+  elseif (rt and self.x + self.w > x_lim) or (lf and self.x < x_lim) then
+    -- Can't limit by x, will limit by y
+    if (dn and y_lim < y_v) or (up and y_lim > y_v) then
+      y_lim_def[1] = y_lim
+      y_lim_def[2] = obj
+    end
+  elseif (dn and self.y + self.h > y_lim) or (up and self.y < y_lim) then
+    -- Can't limit by y, will limit by x
+    if (rt and x_lim < x_v) or (lf and x_lim > x_v) then
+      x_lim_def[1] = x_lim
+      x_lim_def[2] = obj
+    end
+  else
+    local x_time = (x_lim - self.x - (lf and 0 or self.w)) / self.speed.x
+    local y_time = (y_lim - self.y - (up and 0 or self.h)) / self.speed.y
+    if x_time > y_time then
+      -- Will limit by x
+      if (rt and x_lim < x_v) or (lf and x_lim > x_v) then
+        x_lim_def[1] = x_lim
+        x_lim_def[2] = obj
+      end
+    elseif (dn and y_lim < y_v) or (up and y_lim > y_v) then
+      y_lim_def[1] = y_lim
+      y_lim_def[2] = obj
+    end
+  end
+end
+
+function GameObject:stop_at_x(x, moving_left)
+  self.speed.x = 0
+  self.x = moving_left and x or x - self.w
+end
+
+function GameObject:stop_at_y(y, moving_up)
+  self.speed.y = 0
+  self.y = moving_up and y or y - self.h
+end

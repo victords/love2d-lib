@@ -17,20 +17,20 @@ function Ramp:contact(obj)
   if self.inverted then return false end
   return obj.x + obj.w > self.x and
     obj.x < self.x + self.w and
-    number.approx_equal(obj.x, self.get_x(obj)) and
-    number.approx_equal(obj.y, self.get_y(obj))
+    utils.approx_equal(obj.x, self:get_x(obj)) and
+    utils.approx_equal(obj.y, self:get_y(obj))
 end
 
 function Ramp:intersect(obj)
   return obj.x + obj.w > self.x and
     obj.x < self.x + self.w and
-    ((self.inverted and obj.y < self.get_y(obj) && obj.y + obj.h > self.y) or
-     (not self.inverted and obj.y > self.get_y(obj) && obj.y < self.y + self.h))
+    ((self.inverted and obj.y < self:get_y(obj) and obj.y + obj.h > self.y) or
+     (not self.inverted and obj.y > self:get_y(obj) and obj.y < self.y + self.h))
 end
 
 function Ramp:check_can_collide(m)
-  local y = self.get_y(m) + (@inverted ? 0 : m.h)
-  @can_collide = m.x + m.w > self.x and self.x + self.w > m.x and m.y < y and m.y + m.h > y
+  local y = self:get_y(m) + (self.inverted and 0 or m.h)
+  self.can_collide = m.x + m.w > self.x and self.x + self.w > m.x and m.y < y and m.y + m.h > y
 end
 
 function Ramp:check_intersection(obj)
@@ -38,7 +38,7 @@ function Ramp:check_intersection(obj)
 
   local counter = self.left and obj.prev_speed.x > 0 or not self.left and obj.prev_speed.x < 0
   if counter and ((self.inverted and obj.prev_speed.y < 0) or (not self.inverted and obj.prev_speed.y > 0)) then
-    local dx = self.get_x(obj) - obj.x
+    local dx = self:get_x(obj) - obj.x
     local s = math.abs(obj.prev_speed.y / obj.prev_speed.x)
     dx = dx / s + self.ratio
     obj.x = obj.x + dx
@@ -48,7 +48,7 @@ function Ramp:check_intersection(obj)
   end
 
   obj.speed.y = 0
-  obj.y = self.get_y(obj)
+  obj.y = self:get_y(obj)
 end
 
 function Ramp:get_x(obj)
