@@ -36,7 +36,7 @@ end
 
 function Map:get_center()
   local absolute_size = self:absolute_size()
-  Vector.new(absolute_size.x * 0.5, absolute_size.y * 0.5)
+  return Vector.new(absolute_size.x * 0.5, absolute_size.y * 0.5)
 end
 
 function Map:get_screen_pos(map_x, map_y)
@@ -192,7 +192,7 @@ function Map:get_isometric_position(scr_x, scr_y)
   center.y = center.y * self.tile_ratio
 
   -- Rotates the position -45 degrees
-  position.rotate(MINUS_PI_DIV_4)
+  position:rotate(MINUS_PI_DIV_4)
 
   -- Returns the reference to the center of the map
   position = position + center
