@@ -31,3 +31,9 @@ end
 function Vector:distance(other)
   return math.sqrt((self.x - other.x)^2 + (self.y - other.y)^2)
 end
+
+function Vector:rotate(radians)
+  local sin = math.sin(radians)
+  local cos = math.cos(radians)
+  self.x, self.y = cos * self.x - sin * self.y, sin * self.x + cos * self.y
+end
