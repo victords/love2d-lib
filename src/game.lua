@@ -9,7 +9,10 @@ function love.load()
     Block.new(0, 590, 800, 10),
     Block.new(400, 550, 100, 20)
   }
-  ramps = {}
+  ramps = {
+    Ramp.new(10, 500, 60, 90, false),
+    Ramp.new(690, 540, 100, 50, true)
+  }
 end
 
 function love.update(dt)
@@ -36,6 +39,9 @@ end
 function love.draw()
   for _, b in ipairs(blocks) do
     love.graphics.rectangle("fill", b.x, b.y, b.w, b.h)
+  end
+  for _, r in ipairs(ramps) do
+    love.graphics.polygon("fill", r.x, r.y + r.h, r.x + r.w, r.y + r.h, r.left and r.x + r.w or r.x, r.y)
   end
   game_object:draw()
 end

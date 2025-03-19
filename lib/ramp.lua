@@ -9,8 +9,9 @@ function Ramp.new(x, y, w, h, left, inverted)
   self.h = h
   self.left = left
   self.inverted = inverted or false
-  self.ratio = w / h
+  self.ratio = h / w
   self.factor = w / math.sqrt(w^2 + h^2)
+  return self
 end
 
 function Ramp:contact(obj)
@@ -34,7 +35,7 @@ function Ramp:check_can_collide(m)
 end
 
 function Ramp:check_intersection(obj)
-  if not (self.can_collide and self.intersect(obj)) then return end
+  if not (self.can_collide and self:intersect(obj)) then return end
 
   local counter = self.left and obj.prev_speed.x > 0 or not self.left and obj.prev_speed.x < 0
   if counter and ((self.inverted and obj.prev_speed.y < 0) or (not self.inverted and obj.prev_speed.y > 0)) then
