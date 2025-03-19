@@ -2,6 +2,8 @@ Sprite = {}
 Sprite.__index = Sprite
 
 function Sprite.new(x, y, img_path, cols, rows)
+  cols = cols or 1
+  rows = rows or 1
   local self = setmetatable({}, Sprite)
   self.x = x
   self.y = y

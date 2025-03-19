@@ -149,6 +149,153 @@ function GameObject:move(forces, obst, ramps, set_speed)
   self:check_contact(obst, ramps)
 end
 
+function GameObject:move_carrying(arg, scalar_speed, carried_objs, obstacles, ramps, ignore_collision)
+  local speed = self.speed
+  local x_aim = nil
+  local y_aim = nil
+  if scalar_speed then
+    local x_d = arg.x - self.x
+    local y_d = arg.y - self.y
+    distance = math.sqrt(x_d^2 + y_d^2)
+
+    if distance == 0 then
+      speed.x = 0
+      speed.y = 0
+      return
+    end
+
+    speed.x = x_d * scalar_speed / distance
+    speed.y = y_d * scalar_speed / distance
+    x_aim = self.x + speed.x
+    y_aim = self.y + speed.y
+  else
+    x_aim = self.x + speed.x + Physics.gravity.x + arg.x
+    y_aim = self.y + speed.y + Physics.gravity.y + arg.y
+  end
+
+  local passengers = {}
+  for _, o in ipairs(carried_objs) do
+    if self.x + self.w > o.x and o.x + o.w > self.x then
+      local foot = o.y + o.h
+      if utils.approx_equal(foot, self.y) or (speed.y < 0 and foot < self.y and foot > y_aim) then
+        table.insert(passengers, o)
+      end
+    end
+  end
+
+  local prev_x = self.x
+  local prev_y = self.y
+  if scalar_speed then
+    if speed.x > 0 and x_aim >= arg.x or speed.x < 0 and x_aim <= arg.x then
+      self.x = arg.x
+      speed.x = 0
+    else
+      self.x = x_aim
+    end
+    if speed.y > 0 and y_aim >= arg.y or speed.y < 0 and y_aim <= arg.y then
+      self.y = arg.y
+      speed.y = 0
+    else
+      self.y = y_aim
+    end
+  else
+    self:move(arg, ignore_collision and {} or obstacles, ignore_collision and {} or ramps)
+  end
+
+  local forces = Vector.new(self.x - prev_x, self.y - prev_y)
+  local prev_g = utils.clone(Physics.gravity)
+  Physics.gravity.x = 0
+  Physics.gravity.y = 0
+  for _, p in ipairs(passengers) do
+    if getmetatable(p).move then
+      local prev_speed = utils.clone(p.speed)
+      local prev_forces = utils.clone(p.stored_forces)
+      local prev_bottom = p.bottom
+      p.speed.x = 0
+      p.speed.y = 0
+      p.stored_forces.x = 0
+      p.stored_forces.y = 0
+      p.bottom = nil
+      p:move(forces * p.mass, obstacles, ramps)
+      p.speed = prev_speed
+      p.stored_forces = prev_forces
+      p.bottom = prev_bottom
+    else
+      p.x = p.x + forces.x
+      p.y = p.y + forces.y
+    end
+  end
+  Physics.gravity = prev_g
+end
+
+function GameObject:move_free(aim, scalar_speed)
+  local speed = self.speed
+  if type(aim) == "number" then
+    local rads = aim * math.pi / 180
+    speed.x = scalar_speed * math.cos(rads)
+    speed.y = scalar_speed * math.sin(rads)
+    self.x = self.x + speed.x
+    self.y = self.y + speed.y
+  else -- aim is a Vector
+    local x_d = aim.x - self.x
+    local y_d = aim.y - self.y
+    local distance = math.sqrt(x_d^2 + y_d^2)
+
+    if distance == 0 then
+      speed.x = 0
+      speed.y = 0
+      return
+    end
+
+    speed.x = x_d * scalar_speed / distance
+    speed.y = y_d * scalar_speed / distance
+
+    if (speed.x < 0 and self.x + speed.x <= aim.x) or (speed.x >= 0 and self.x + speed.x >= aim.x) then
+      self.x = aim.x
+      speed.x = 0
+    else
+      self.x = self.x + speed.x
+    end
+
+    if (speed.y < 0 and self.y + speed.y <= aim.y) or (speed.y >= 0 and self.y + speed.y >= aim.y) then
+      self.y = aim.y
+      speed.y = 0
+    else
+      self.y = self.y + speed.y
+    end
+  end
+end
+
+function GameObject:cycle(points, scalar_speed, carried_objs, obstacles, ramps, stop_time)
+  stop_time = stop_time or 0
+  if not self.cycle_setup then
+    self.cur_point = self.cur_point or 1
+    if carried_objs then
+      obstacles = obstacles or {}
+      ramps = ramps or {}
+      self:move_carrying(points[self.cur_point], scalar_speed, carried_objs, obstacles, ramps)
+    else
+      self:move_free(points[self.cur_point], scalar_speed)
+    end
+  end
+  if self.speed.x == 0 and self.speed.y == 0 then
+    if not self.cycle_setup then
+      self.cycle_timer = 0
+      self.cycle_setup = true
+    end
+    if self.cycle_timer >= stop_time then
+      if self.cur_point == #points then
+        self.cur_point = 1
+      else
+        self.cur_point = self.cur_point + 1
+      end
+      self.cycle_setup = false
+    else
+      self.cycle_timer = self.cycle_timer + 1
+    end
+  end
+end
+
 -- private
 function GameObject:check_contact(obst, ramps)
   local prev_bottom = self.bottom
