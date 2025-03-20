@@ -1,9 +1,9 @@
 Image = {}
 Image.__index = Image
 
-function Image.new(path, source_x, source_y, source_w, source_h)
+function Image.new(path_or_source, source_x, source_y, source_w, source_h)
   local self = setmetatable({}, Image)
-  self.source = love.graphics.newImage(path)
+  self.source = type(path_or_source) == "string" and love.graphics.newImage(path_or_source) or path_or_source
 
   local img_width = self.source:getWidth()
   local img_height = self.source:getHeight()

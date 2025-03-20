@@ -22,6 +22,7 @@ require("lib.mouse")
 require("lib.rectangle")
 require("lib.vector")
 require("lib.image")
+require("lib.tileset")
 require("lib.sprite")
 require("lib.map")
 
