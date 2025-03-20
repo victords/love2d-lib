@@ -41,7 +41,8 @@ end
 function Sprite:draw(scale_x, scale_y, angle)
   scale_x = scale_x or 1
   scale_y = scale_y or 1
-  origin_x = 0.5 * self.col_width
-  origin_y = 0.5 * self.row_height
+  angle = angle and (angle * math.pi / 180)
+  local origin_x = 0.5 * self.col_width
+  local origin_y = 0.5 * self.row_height
   love.graphics.draw(self.img, self.quads[self.img_index], self.x + scale_x * origin_x, self.y + scale_y * origin_y, angle, scale_x, scale_y, origin_x, origin_y)
 end
