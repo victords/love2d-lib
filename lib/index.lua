@@ -24,6 +24,7 @@ require("lib.vector")
 require("lib.image")
 require("lib.tileset")
 require("lib.sprite")
+require("lib.font")
 require("lib.map")
 
 require("lib.physics")
