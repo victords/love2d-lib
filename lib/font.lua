@@ -13,6 +13,8 @@ function Font:draw_text(text, x, y, color, scale)
 end
 
 function Font:draw_text_rel(text, x, y, rel_x, rel_y, color, scale)
+  rel_x = rel_x or 0
+  rel_y = rel_y or 0
   scale = scale or 1
   local width = rel_x ~= 0 and scale * self:text_width(text)
   if rel_x == 0.5 then
@@ -21,9 +23,9 @@ function Font:draw_text_rel(text, x, y, rel_x, rel_y, color, scale)
     x = utils.round(x - width)
   end
   if rel_y == 0.5 then
-    y = utils.round(y - self.height / 2)
-  elseif rel_x == 1 then
-    y = utils.round(y - self.height)
+    y = utils.round(y - scale * self.height / 2)
+  elseif rel_y == 1 then
+    y = utils.round(y - scale * self.height)
   end
   if color then love.graphics.setColor(color) end
   love.graphics.print(text, self.source, x, y, nil, scale, scale)

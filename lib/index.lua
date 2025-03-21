@@ -25,6 +25,7 @@ require("lib.image")
 require("lib.tileset")
 require("lib.sprite")
 require("lib.font")
+require("lib.image_font")
 require("lib.map")
 
 require("lib.physics")
