@@ -15,7 +15,6 @@ utils = {
   end
 }
 
-
 require("lib.keyboard")
 require("lib.mouse")
 
@@ -26,6 +25,7 @@ require("lib.tileset")
 require("lib.sprite")
 require("lib.font")
 require("lib.image_font")
+require("lib.text_helper")
 require("lib.map")
 
 require("lib.physics")

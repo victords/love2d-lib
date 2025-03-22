@@ -1,15 +1,16 @@
 require("lib.index")
 
 function love.load()
+  love.graphics.setDefaultFilter("nearest", "nearest")
   font = ImageFont.new("data/font/font.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚÀÃÕÂÊÔÑÇáéíóúàãõâêôñç0123456789.,:;!?¡¿/\\()[]+-%'\"←→∞$ ", 1)
+  text_helper = TextHelper.new(font)
 end
 
 function love.update(dt)
 end
 
 function love.draw()
-  font:draw_text_rel("top-left aligned", 10, 10, 0, 0, {1, 1, 1}, 2)
-  font:draw_text_rel("centered", 400, 300, 0.5, 0.5, {1, 0.2, 0.2}, 2)
-  font:draw_text_rel("bottom-right aligned", 790, 590, 1, 1, {0.2, 0.2, 1}, 2)
-  font:draw_text_rel("Atenção, rapaz! ()[]", 10, 50)
+  text_helper:write_line("top-left aligned", 10, 10)
+  text_helper:write_line("centered", 400, 300, "center", {1, 0.2, 0.2}, "border", 2, {1, 1, 1}, 2)
+  text_helper:write_line("bottom-right aligned", 790, 570, "right", {0.2, 0.2, 1}, "shadow", 2, {0, 1, 0, 0.5}, 2)
 end
