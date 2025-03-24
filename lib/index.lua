@@ -22,20 +22,22 @@ utils = {
   end
 }
 
-require("lib.keyboard")
-require("lib.mouse")
+require("lib.geometry.map")
+require("lib.geometry.rectangle")
+require("lib.geometry.vector")
 
-require("lib.rectangle")
-require("lib.vector")
-require("lib.image")
-require("lib.tileset")
-require("lib.sprite")
-require("lib.font")
-require("lib.image_font")
-require("lib.text_helper")
-require("lib.map")
+require("lib.graphics.image")
+require("lib.graphics.sprite")
+require("lib.graphics.tileset")
 
-require("lib.physics")
-require("lib.block")
-require("lib.ramp")
-require("lib.game_object")
+require("lib.input.keyboard")
+require("lib.input.mouse")
+
+require("lib.physics.block")
+require("lib.physics.game_object")
+require("lib.physics.physics")
+require("lib.physics.ramp")
+
+require("lib.text.font")
+require("lib.text.image_font")
+require("lib.text.text_helper")
