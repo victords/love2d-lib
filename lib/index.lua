@@ -12,6 +12,13 @@ utils = {
       clone[k] = v
     end
     return clone
+  end,
+  split = function(str, separator)
+    local t = {}
+    for s in str:gmatch("[^" .. separator .. "]+") do
+      table.insert(t, s)
+    end
+    return t
   end
 }
 
