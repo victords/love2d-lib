@@ -5,7 +5,7 @@ KB = {
   held_delay = 30,
   held_interval = 5,
 }
-local key_codes = {
+local KEY_CODES = {
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
   "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "kp0", "kp1", "kp2", "kp3", "kp4", "kp5", "kp6", "kp7", "kp8", "kp9",
   "space", "'", "-", "=", "[", "]", "\\", "/", ",", ".", ";", "kp+", "kp-", "kp*", "kp/", "kpenter",
@@ -13,13 +13,13 @@ local key_codes = {
   "lshift", "rshift", "lctrl", "rctrl", "lalt", "ralt",
   "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12"
 }
-for _, v in pairs(key_codes) do
+for _, v in pairs(KEY_CODES) do
   KB.cur_down[v] = false
   KB.held_timer[v] = 0
 end
 
 function KB.update()
-  for _, v in pairs(key_codes) do
+  for _, v in pairs(KEY_CODES) do
     KB.prev_down[v] = KB.cur_down[v]
     local cur_down = love.keyboard.isDown(v)
     if cur_down then

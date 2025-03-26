@@ -41,8 +41,9 @@ utils = {
   end
 }
 
-require("lib.forms.component")
 require("lib.forms.button")
+require("lib.forms.component")
+require("lib.forms.text_field")
 require("lib.forms.toggle_button")
 
 require("lib.geometry.map")
