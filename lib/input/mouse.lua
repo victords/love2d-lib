@@ -8,6 +8,7 @@ for _, v in pairs(button_number_to_name) do
 end
 
 function Mouse.update()
+  Mouse.click_captured = false
   Mouse.x = love.mouse.getX()
   Mouse.y = love.mouse.getY()
   for i, v in ipairs(button_number_to_name) do
@@ -26,4 +27,12 @@ end
 
 function Mouse.released(button_name)
   return Mouse.prev_down[button_name] and not Mouse.cur_down[button_name]
+end
+
+function Mouse.over(x, y, w, h)
+  if getmetatable(x) == Rectangle then
+    return Mouse.x >= x.x and Mouse.x < x.x + x.w and Mouse.y >= x.y and Mouse.y < x.y + x.h
+  end
+
+  return Mouse.x >= x and Mouse.x < x + w and Mouse.y >= y and Mouse.y < y + h
 end

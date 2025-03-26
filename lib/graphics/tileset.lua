@@ -11,7 +11,7 @@ function Tileset.new(path, cols, rows)
   self.tile_height = math.floor(img_height / rows)
   self.tiles = {}
   for i = 1, self.tile_count do
-    self.tiles[i] = Image.new(image, (i % cols) * self.tile_width, math.floor(i / cols) * self.tile_height, self.tile_width, self.tile_height)
+    self.tiles[i] = Image.new(image, ((i - 1) % cols) * self.tile_width, math.floor((i - 1) / cols) * self.tile_height, self.tile_width, self.tile_height)
   end
 
   return self
