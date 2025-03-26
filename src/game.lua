@@ -3,7 +3,7 @@ require("lib.index")
 function love.load()
   -- love.graphics.setDefaultFilter("nearest", "nearest")
   font = Font.new("data/font/font.ttf")
-  button = Button.new(10, 10, { font = font, text = "Button test", params = 5, anchor = "southeast" }, function(arg) print(arg) end)
+  button = ToggleButton.new(10, 10, { params = 5, anchor = "southeast", img_path = "data/img/button1.png" }, function(val, arg) print(val, arg) end)
 end
 
 function love.update(dt)
@@ -15,5 +15,5 @@ function love.update(dt)
 end
 
 function love.draw()
-  button:draw({0.6, 0.6, 1})
+  button:draw()
 end

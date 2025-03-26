@@ -43,6 +43,7 @@ utils = {
 
 require("lib.forms.component")
 require("lib.forms.button")
+require("lib.forms.toggle_button")
 
 require("lib.geometry.map")
 require("lib.geometry.rectangle")

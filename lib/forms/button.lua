@@ -88,7 +88,7 @@ function Button:draw(color)
   if not self.visible then return end
 
   if self.img then
-    self.img[self.img_index]:draw(self.x, self.y, self.scale, self.scale, color)
+    self.img[self.img_index]:draw(self.x, self.y, self.scale, self.scale, nil, color)
   elseif self.draw_rect then
     local rect_color = utils.clone(color or {1, 1, 1})
     if self.state == "over" then
