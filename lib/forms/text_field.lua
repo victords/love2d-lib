@@ -81,17 +81,16 @@ function TextField:update()
   if not self.focused then return end
 
   if not Mouse.click_captured then
---     if Mouse.double_click("left") then
---       if #self.nodes > 1
---         self.anchor1 = 1
---         self.anchor2 = #self.nodes
---         self.cur_node = self.anchor2
---         self.double_clicked = true
---       end
---       self:set_cursor_visible()
---       Mouse.click_captured = true
---     else
-    if Mouse.pressed("left") then
+    if Mouse.double_clicked("left") then
+      if #self.nodes > 1 then
+        self.anchor1 = 1
+        self.anchor2 = #self.nodes
+        self.cur_node = self.anchor2
+        self.double_clicked = true
+      end
+      self:set_cursor_visible()
+      Mouse.click_captured = true
+    elseif Mouse.pressed("left") then
       self:focus_and_set_anchor()
       Mouse.click_captured = true
     elseif Mouse.down("left") then
