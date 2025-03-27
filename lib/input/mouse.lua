@@ -5,7 +5,7 @@ Mouse = {
   dbl_click_timer = {},
   double_click_delay = 8
 }
-local button_number_to_name = { "left", "right", "middle" }
+local button_number_to_name = {"left", "right", "middle"}
 for _, v in pairs(button_number_to_name) do
   Mouse.cur_down[v] = false
 end

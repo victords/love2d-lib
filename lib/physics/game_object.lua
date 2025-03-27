@@ -114,9 +114,9 @@ function GameObject:move(forces, obst, ramps, set_speed)
     else
       -- diagonal movement
       x_aim = self.x + speed.x + (rt and self.w or 0)
-      x_lim_def = { x_aim, nil }
+      x_lim_def = {x_aim, nil}
       y_aim = self.y + speed.y + (dn and self.h or 0)
-      y_lim_def = { y_aim, nil }
+      y_lim_def = {y_aim, nil}
       for _, c in ipairs(coll_list) do
         self:find_limits(c, x_aim, y_aim, x_lim_def, y_lim_def, up, rt, dn, lf)
       end

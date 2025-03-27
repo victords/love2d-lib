@@ -203,7 +203,7 @@ end
 
 function TextField:set_text(text, trigger_changed)
   self.text = text.sub(1, self.max_length)
-  self.nodes = { self.text_x }
+  self.nodes = {self.text_x}
   local x = self.nodes[1]
   for char in self.text:gmatch('.') do
     x = x + self.font:text_width(char) * self.scale
