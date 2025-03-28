@@ -11,7 +11,7 @@ function Component.new(x, y, w, h, options)
   self.font = options.font
   self.text = options.text
   self.text_color = options.text_color or {0, 0, 0}
-  self.disabled_text_color = options.disabled_text_color or {0.2, 0.2, 0.2}
+  self.disabled_text_color = options.disabled_text_color or {0.5, 0.5, 0.5}
   self.enabled = true
   self.visible = true
   return self
@@ -20,6 +20,10 @@ end
 function Component:set_position(x, y)
   self.x = x
   self.y = y
+end
+
+function Component:set_enabled(value)
+  self.enabled = value
 end
 
 function Component:update() end

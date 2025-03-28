@@ -12,6 +12,7 @@ function Panel.new(x, y, w, h, components, options)
   for _, c in ipairs(components) do
     _, new_x, new_y = utils.check_anchor(c.anchor, c.anchor_offset_x, c.anchor_offset_y, c.w, c.h, self.w, self.h)
     c:set_position(self.x + new_x, self.y + new_y)
+    c.panel = self
   end
 
   if options.img_path then

@@ -44,6 +44,7 @@ utils = {
 require("lib.forms.button")
 require("lib.forms.component")
 require("lib.forms.drop_down_list")
+require("lib.forms.label")
 require("lib.forms.panel")
 require("lib.forms.text_field")
 require("lib.forms.toggle_button")
