@@ -41,6 +41,9 @@ utils = {
   end
 }
 
+require("lib.audio.song")
+require("lib.audio.sound")
+
 require("lib.forms.button")
 require("lib.forms.component")
 require("lib.forms.drop_down_list")
