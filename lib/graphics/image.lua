@@ -29,3 +29,7 @@ function Image:draw(x, y, scale_x, scale_y, angle, color)
   end
   if color then love.graphics.setColor(1, 1, 1) end
 end
+
+function Image.setRetro()
+  love.graphics.setDefaultFilter("nearest", "nearest")
+end

@@ -16,17 +16,19 @@ function GameObject.new(x, y, w, h, img_path, img_gap, cols, rows, mass, max_spe
   return self
 end
 
-function GameObject:draw(scale_x, scale_y, angle, scale_img_gap)
+function GameObject:draw(scale_x, scale_y, angle, flip, scale_img_gap)
   scale_x = scale_x or 1
   scale_y = scale_y or 1
   if scale_img_gap == nil then scale_img_gap = true end
-  img_gap_scale_x = scale_img_gap and scale_x or 1
-  img_gap_scale_y = scale_img_gap and scale_y or 1
-  origin_x = 0.5 * self.w - self.img_gap.x
-  origin_y = 0.5 * self.h - self.img_gap.y
-  x = self.x + img_gap_scale_x * self.img_gap.x + scale_x * origin_x
-  y = self.y + img_gap_scale_y * self.img_gap.y + scale_y * origin_y
-  love.graphics.draw(self.img, self.quads[self.img_index], x, y, angle, scale_x, scale_y, origin_x, origin_y)
+  local img_gap_scale_x = scale_img_gap and scale_x or 1
+  local img_gap_scale_y = scale_img_gap and scale_y or 1
+  local origin_x = 0.5 * self.w - self.img_gap.x
+  local origin_y = 0.5 * self.h - self.img_gap.y
+  local x = self.x + img_gap_scale_x * self.img_gap.x + scale_x * origin_x
+  local y = self.y + img_gap_scale_y * self.img_gap.y + scale_y * origin_y
+  local scale_x_factor = flip == "horiz" and -1 or 1
+  local scale_y_factor = flip == "vert" and -1 or 1
+  love.graphics.draw(self.img, self.quads[self.img_index], x, y, angle, scale_x_factor * scale_x, scale_y_factor * scale_y, origin_x, origin_y)
 end
 
 function GameObject:bounds()

@@ -1,17 +1,19 @@
 require("lib.index")
 
 function love.load()
-  -- debug.debug()
-  keys = {"gp1_left", "gp1_right", "gp1_up", "gp1_down", "gp1_a", "gp1_b", "gp1_x", "gp1_y", "gp1_start", "gp1_back", "gp1_leftshoulder", "gp1_rightshoulder", "gp1_lt", "gp1_rt"}
+  Image.setRetro()
+  sprite = GameObject.new(10, 10, 6, 10, "data/img/attack4.png", Vector.new(-6, -4), 4, 2)
 end
 
 function love.update(dt)
-  KB.update()
-  for _, v in ipairs(keys) do
-    if KB.down(v) then print(v) end
-  end
+
 end
 
 function love.draw()
-
+  sprite:draw(2, 2, nil, "horiz")
+  love.graphics.rectangle("fill", sprite.x, sprite.y, sprite.w * 2, sprite.h * 2)
+  sprite.y = sprite.y + 28
+  sprite:draw(2, 2)
+  love.graphics.rectangle("fill", sprite.x, sprite.y, sprite.w * 2, sprite.h * 2)
+  sprite.y = sprite.y - 28
 end
