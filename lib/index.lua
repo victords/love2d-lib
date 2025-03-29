@@ -70,4 +70,5 @@ require("lib.physics.ramp")
 
 require("lib.text.font")
 require("lib.text.image_font")
+require("lib.text.localization")
 require("lib.text.text_helper")

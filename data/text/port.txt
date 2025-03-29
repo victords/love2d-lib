@@ -1,0 +1,2 @@
+str1	Valor da string 1
+str2	Valor da string 2: $ e $
