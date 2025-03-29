@@ -12,9 +12,10 @@ function Sprite.new(x, y, img_path, cols, rows)
   self.rows = rows
 
   self.img = love.graphics.newImage(img_path)
-  self.img_index = 0
-  self.index_index = 0
+  self.img_index = 1
+  self.index_index = 1
   self.anim_timer = 0
+  self.animate_once_control = 0
 
   local img_width = self.img:getWidth()
   local img_height = self.img:getHeight()
@@ -22,20 +23,52 @@ function Sprite.new(x, y, img_path, cols, rows)
   self.row_height = math.floor(img_height / rows)
   local total_quads = cols * rows
   self.quads = {}
-  for i = 0, total_quads - 1 do
-    self.quads[i] = love.graphics.newQuad((i % cols) * self.col_width, math.floor(i / cols) * self.row_height, self.col_width, self.row_height, img_width, img_height)
+  for i = 1, total_quads do
+    self.quads[i] = love.graphics.newQuad(((i - 1) % cols) * self.col_width, math.floor((i - 1) / cols) * self.row_height, self.col_width, self.row_height, img_width, img_height)
   end
 
   return self
 end
 
 function Sprite:animate(indices, interval)
+  if self.animate_once_control ~= 0 then self.animate_once_control = 0 end
+
   self.anim_timer = self.anim_timer + 1
   if self.anim_timer >= interval then
-    self.index_index = (self.index_index + 1) % #indices
-    self.img_index = indices[self.index_index + 1]
+    self.index_index = self.index_index % #indices + 1
+    self.img_index = indices[self.index_index]
     self.anim_timer = 0
   end
+end
+
+function Sprite:animate_once(indices, interval, callback)
+  if self.animate_once_control == 2 then return end
+
+  if self.animate_once_control == 0 then
+    self.anim_timer = 0
+    self.img_index = indices[1]
+    self.index_index = 1
+    self.animate_once_control = 1
+  end
+
+  self.anim_timer = self.anim_timer + 1
+  if self.anim_timer < interval then return end
+
+  if self.index_index == #indices then
+    self.animate_once_control = 2
+    callback()
+  else
+    self.index_index = self.index_index + 1
+    self.img_index = indices[self.index_index]
+    self.anim_timer = 0
+  end
+end
+
+function Sprite:reset_animation(img_index)
+  self.img_index = img_index
+  self.index_index = 1
+  self.anim_timer = 0
+  self.animate_once_control = 0
 end
 
 function Sprite:draw(scale_x, scale_y, color, angle, flip)
