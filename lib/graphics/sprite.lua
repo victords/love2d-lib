@@ -38,7 +38,7 @@ function Sprite:animate(indices, interval)
   end
 end
 
-function Sprite:draw(scale_x, scale_y, angle, flip)
+function Sprite:draw(scale_x, scale_y, color, angle, flip)
   scale_x = scale_x or 1
   scale_y = scale_y or 1
   angle = angle and (angle * math.pi / 180)
@@ -46,5 +46,7 @@ function Sprite:draw(scale_x, scale_y, angle, flip)
   local origin_y = 0.5 * self.row_height
   local scale_x_factor = flip == "horiz" and -1 or 1
   local scale_y_factor = flip == "vert" and -1 or 1
+  if color then love.graphics.setColor(color) end
   love.graphics.draw(self.img, self.quads[self.img_index], self.x + scale_x * origin_x, self.y + scale_y * origin_y, angle, scale_x_factor * scale_x, scale_y_factor * scale_y, origin_x, origin_y)
+  if color then love.graphics.setColor(1, 1, 1) end
 end
