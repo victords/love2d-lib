@@ -1,2 +1,3 @@
-str1	Value of string 1
-str2	akjdhakdjh $ and $\second line with \\ in it.
+str1		Value of string 1
+str2		akjdhakdjh $ and $\second line with \\ in it.
+longer_key	Value here.

@@ -10,7 +10,7 @@ function Localization.init(initial_language)
     Localization.texts[language] = {}
     local contents = love.filesystem.read("data/text/" .. filename)
     for line in contents:gmatch("[^\n]+") do
-      local _, _, key, text = line:find("(.*)\t(.*)")
+      local _, _, key, text = line:find("([^\t]+)\t+([^\t]+)")
       Localization.texts[language][key] = text
     end
   end
