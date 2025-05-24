@@ -9,7 +9,7 @@ function love.load()
     Button.new(-40, 55, {img_path = "button1", font = font}),
     Button.new(5, 150, {img_path = "button1", font = font}),
     TextField.new(120, 50, {font = font})
-  }, {img_path = "panel", tiled = true, clip = true})
+  }, {img_path = "panel", tiled = true, clip = true, total_w = 200, total_h = 250, scroll_speed = 3})
 end
 
 function love.update(dt)
