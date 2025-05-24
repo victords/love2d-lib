@@ -69,7 +69,7 @@ function TextField:update()
   if not (self.enabled and self.visible) then return end
 
   -- Mouse --------------------------------------------------------------------
-  if Mouse.over(self.x, self.y, self.w, self.h) then
+  if Mouse.over(self:get_bounds()) then
     if not self.focused and Mouse.pressed("left") and not Mouse.click_captured then
       self:focus()
       return

@@ -38,14 +38,7 @@ end
 function Button:update()
   if not (self.enabled and self.visible) then return end
 
-  local clip = self.panel and self.panel.clip
-  local x = clip and self.x < self.panel.x and self.panel.x or self.x
-  local y = clip and self.y < self.panel.y and self.panel.y or self.y
-  local x2 = clip and self.x + self.w > self.panel.x + self.panel.w and self.panel.x + self.panel.w or self.x + self.w
-  local y2 = clip and self.y + self.h > self.panel.y + self.panel.h and self.panel.y + self.panel.h or self.y + self.h
-  local w = x2 - x
-  local h = y2 - y
-  local mouse_over = Mouse.over(x, y, w, h)
+  local mouse_over = Mouse.over(self:get_bounds())
   local mouse_press = Mouse.pressed("left") and not Mouse.click_captured
   local mouse_rel = Mouse.released("left")
 
