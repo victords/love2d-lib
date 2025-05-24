@@ -31,6 +31,14 @@ function Panel.new(x, y, w, h, components, options)
     end
   end
 
+  if options.clip then
+    self.clip = true
+    self.shader = Res.shader("clip")
+    self.shader:send("x", self.x)
+    self.shader:send("y", self.y)
+    self.shader:send("w", self.w)
+    self.shader:send("h", self.h)
+  end
   self.enabled = true
   self.visible = true
   return self
@@ -87,7 +95,13 @@ function Panel:draw(color)
     self.img:draw(self.x, self.y, self.scale_x, self.scale_y, nil, color)
   end
 
+  if self.shader then
+    love.graphics.setShader(self.shader)
+  end
   for _, c in ipairs(self.components) do
     c:draw(color)
+  end
+  if self.shader then
+    love.graphics.setShader()
   end
 end

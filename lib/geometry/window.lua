@@ -1,11 +1,11 @@
 Window = {}
 Window.__index = Window
 
-function Window.set_size(fullscreen, width, height, reference_width, reference_height)
+function Window.init(fullscreen, width, height, reference_width, reference_height)
   width = width or 1280
   height = height or 720
-  reference_width = reference_width or 1920
-  reference_height = reference_height or 1080
+  reference_width = reference_width or 1280
+  reference_height = reference_height or 720
 
   Window.width = width
   Window.height = height
