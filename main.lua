@@ -2,22 +2,22 @@ require("lib.index")
 
 function love.load()
   Window.init()
-  font = Res.font("font", 20)
-  panel = Panel.new(10, 10, 160, 160, {
-    Button.new(5, -10, {img_path = "button1", font = font}),
-    Button.new(120, 5, {img_path = "button1", font = font}),
-    Button.new(-40, 55, {img_path = "button1", font = font}),
-    Button.new(5, 150, {img_path = "button1", font = font}),
-    TextField.new(120, 50, {font = font})
-  }, {img_path = "panel", tiled = true, clip = true, total_w = 200, total_h = 250, scroll_speed = 3})
+  Physics.setEngine("love")
+
+  objs = {
+    Block.new(0, 600, 600, 40),
+    Block.new(600, 0, 40, 600),
+    Ramp.new(520, 520, 80, 80, true),
+  }
 end
 
 function love.update(dt)
-  Mouse.update()
-  KB.update()
-  panel:update()
+  Physics.update(dt)
 end
 
 function love.draw()
-  panel:draw()
+  love.graphics.setColor(1, 1, 1)
+  for _, o in ipairs(objs) do
+    love.graphics.polygon("fill", o:points())
+  end
 end
