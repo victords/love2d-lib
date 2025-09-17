@@ -1,22 +1,33 @@
 GameObject = setmetatable({}, Sprite)
 GameObject.__index = GameObject
 
-function GameObject.new(x, y, w, h, img_path, img_gap, cols, rows, mass, max_speed)
+function GameObject.new(x, y, w, h, img_path, img_gap, cols, rows, physics_options)
   local self = Sprite.new(x, y, img_path, cols, rows)
   setmetatable(self, GameObject)
   self.w = w
   self.h = h
   self.img_gap = img_gap or Vector.new()
 
-  self.mass = mass or 1
-  self.max_speed = max_speed or Vector.new(15, 15)
-  self.speed = Vector.new()
-  self.stored_forces = Vector.new()
+  if Physics.engine == "minigl" then
+    self.mass = physics_options and physics_options.mass or 1
+    self.max_speed = physics_options and physics_options.max_speed or Vector.new(15, 15)
+    self.speed = Vector.new()
+    self.stored_forces = Vector.new()
+  elseif Physics.engine == "love" then
+    self.body = love.physics.newBody(Physics.world, x + w / 2, y + h / 2, "dynamic")
+    self.shape_type = physics_options and physics_options.shape or "rectangle"
+    self.shape = self.shape_type == "circle" and
+      love.physics.newCircleShape(w / 2) or
+      love.physics.newRectangleShape(w, h)
+    love.physics.newFixture(self.body, self.shape)
+  end
 
   return self
 end
 
 function GameObject:draw(scale_x, scale_y, color, angle, flip, scale_img_gap, round)
+  if self.img == nil then return end
+
   scale_x = scale_x or 1
   scale_y = scale_y or 1
   if scale_img_gap == nil then scale_img_gap = true end
@@ -24,8 +35,10 @@ function GameObject:draw(scale_x, scale_y, color, angle, flip, scale_img_gap, ro
   local img_gap_scale_y = scale_img_gap and scale_y or 1
   local origin_x = 0.5 * (self.w / scale_x) - self.img_gap.x
   local origin_y = 0.5 * (self.h / scale_y) - self.img_gap.y
-  local x = self.x + img_gap_scale_x * self.img_gap.x + scale_x * origin_x
-  local y = self.y + img_gap_scale_y * self.img_gap.y + scale_y * origin_y
+  local x = Physics.engine == "minigl" and self.x or self.body:getX() - self.w / 2
+  local y = Physics.engine == "minigl" and self.y or self.body:getY() - self.h / 2
+  x = x + img_gap_scale_x * self.img_gap.x + scale_x * origin_x
+  y = y + img_gap_scale_y * self.img_gap.y + scale_y * origin_y
   if round then
     x = Utils.round(x)
     y = Utils.round(y)
@@ -34,6 +47,18 @@ function GameObject:draw(scale_x, scale_y, color, angle, flip, scale_img_gap, ro
   local scale_y_factor = flip == "vert" and -1 or 1
   if color then love.graphics.setColor(color) end
   love.graphics.draw(self.img.source, self.quads[self.img_index], x, y, angle, scale_x_factor * scale_x, scale_y_factor * scale_y, origin_x, origin_y)
+  if color then love.graphics.setColor(1, 1, 1) end
+end
+
+function GameObject:draw_shape(color)
+  if Physics.engine == "minigl" then return end
+
+  if color then love.graphics.setColor(color) end
+  if self.shape_type == "circle" then
+    love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.w / 2)
+  else
+    love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
+  end
   if color then love.graphics.setColor(1, 1, 1) end
 end
 

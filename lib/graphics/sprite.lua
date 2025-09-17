@@ -11,18 +11,20 @@ function Sprite.new(x, y, img_path, cols, rows)
   self.cols = cols
   self.rows = rows
 
-  self.img = Res.img(img_path)
+  self.img = img_path and Res.img(img_path)
   self.img_index = 1
   self.index_index = 1
   self.anim_timer = 0
   self.animate_once_control = 0
 
-  self.col_width = math.floor(self.img.width / cols)
-  self.row_height = math.floor(self.img.height / rows)
-  local total_quads = cols * rows
-  self.quads = {}
-  for i = 1, total_quads do
-    self.quads[i] = love.graphics.newQuad(((i - 1) % cols) * self.col_width, math.floor((i - 1) / cols) * self.row_height, self.col_width, self.row_height, self.img.width, self.img.height)
+  if self.img then
+    self.col_width = math.floor(self.img.width / cols)
+    self.row_height = math.floor(self.img.height / rows)
+    local total_quads = cols * rows
+    self.quads = {}
+    for i = 1, total_quads do
+      self.quads[i] = love.graphics.newQuad(((i - 1) % cols) * self.col_width, math.floor((i - 1) / cols) * self.row_height, self.col_width, self.row_height, self.img.width, self.img.height)
+    end
   end
 
   return self
@@ -70,6 +72,8 @@ function Sprite:reset_animation(img_index)
 end
 
 function Sprite:draw(scale_x, scale_y, color, angle, flip)
+  if self.img == nil then return end
+
   scale_x = scale_x or 1
   scale_y = scale_y or 1
   angle = angle and (angle * math.pi / 180)

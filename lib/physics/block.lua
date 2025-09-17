@@ -13,6 +13,7 @@ function Block.new(x, y, w, h, passable)
   elseif Physics.engine == "love" then
     self.body = love.physics.newBody(Physics.world, x + w / 2, y + h / 2)
     self.shape = love.physics.newRectangleShape(w, h)
+    love.physics.newFixture(self.body, self.shape)
   end
 
   return self
