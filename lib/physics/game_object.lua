@@ -20,6 +20,9 @@ function GameObject.new(x, y, w, h, img_path, img_gap, cols, rows, physics_optio
       love.physics.newCircleShape(w / 2) or
       love.physics.newRectangleShape(w, h)
     love.physics.newFixture(self.body, self.shape)
+    if physics_options and physics_options.fixed_rotation then
+      self.body:setFixedRotation(true)
+    end
   end
 
   return self
@@ -67,6 +70,27 @@ function GameObject:bounds()
 end
 
 function GameObject:move(forces, obst, ramps, set_speed)
+  if Physics.engine == "love" then
+    for _, obj in ipairs(obst) do
+      if not obj.passable or (self.body:getY() + self.h / 2 <= obj.y) then
+        obj.body:setActive(true)
+      end
+    end
+    if ramps then
+      for _, obj in ipairs(ramps) do
+        obj.body:setActive(true)
+      end
+    end
+
+    if set_speed then
+      self.body:setLinearVelocity(forces.x, forces.y)
+    else
+      self.body:applyForce(forces.x, forces.y)
+    end
+
+    return
+  end
+
   local speed = self.speed
   if set_speed then
     speed.x = forces.x

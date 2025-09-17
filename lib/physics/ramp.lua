@@ -34,6 +34,7 @@ function Ramp.new(x, y, w, h, left, inverted)
     end
     self.shape = love.physics.newPolygonShape(unpack(points))
     love.physics.newFixture(self.body, self.shape)
+    self.body:setActive(false)
   end
 
   return self

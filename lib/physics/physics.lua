@@ -19,5 +19,10 @@ Physics = {
     if Physics.engine == "minigl" then return end
 
     Physics.world:update(dt)
+    for _, body in ipairs(Physics.world:getBodies()) do
+      if body:getType() == "static" then
+        body:setActive(false)
+      end
+    end
   end
 }

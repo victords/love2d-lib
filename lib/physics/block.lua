@@ -4,16 +4,17 @@ Block.__index = Block
 function Block.new(x, y, w, h, passable)
   local self = setmetatable({}, Block)
 
-  if Physics.engine == "minigl" then
-    self.x = x
-    self.y = y
-    self.w = w
-    self.h = h
-    self.passable = passable or false
-  elseif Physics.engine == "love" then
+  self.x = x
+  self.y = y
+  self.w = w
+  self.h = h
+  self.passable = passable or false
+
+  if Physics.engine == "love" then
     self.body = love.physics.newBody(Physics.world, x + w / 2, y + h / 2)
     self.shape = love.physics.newRectangleShape(w, h)
     love.physics.newFixture(self.body, self.shape)
+    self.body:setActive(false)
   end
 
   return self
