@@ -1,16 +1,32 @@
 Ramp = {}
 Ramp.__index = Ramp
+Ramp.__tostring = function(r)
+  local graphic
+  if r.left then
+    if r.inverted then
+      graphic = "\\|"
+    else
+      graphic = "/|"
+    end
+  elseif r.inverted then
+    graphic = "|/"
+  else
+    graphic = "|\\"
+  end
+  return "Ramp " .. graphic .. " (" .. r.x .. ", " .. r.y .. ", " .. r.w .. ", " .. r.h .. ")"
+end
 
 function Ramp.new(x, y, w, h, left, inverted)
   local self = setmetatable({}, Ramp)
 
+  self.x = x
+  self.y = y
+  self.w = w
+  self.h = h
+  self.left = left
+  self.inverted = inverted or false
+
   if Physics.engine == "minigl" then
-    self.x = x
-    self.y = y
-    self.w = w
-    self.h = h
-    self.left = left
-    self.inverted = inverted or false
     self.ratio = h / w
     self.factor = w / math.sqrt(w^2 + h^2)
   elseif Physics.engine == "love" then
@@ -34,7 +50,7 @@ function Ramp.new(x, y, w, h, left, inverted)
     end
     self.shape = love.physics.newPolygonShape(unpack(points))
     love.physics.newFixture(self.body, self.shape)
-    self.body:setActive(false)
+    self.body:setUserData(self)
   end
 
   return self

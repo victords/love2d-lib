@@ -11,22 +11,26 @@ function love.load()
     Block.new(100, 400, 100, 40, true),
     Ramp.new(520, 520, 80, 80, true),
   }
-  other_obj = Block.new(550, 100, 50, 50)
 
   man = GameObject.new(544, 0, 56, 56, "attack4", nil, 4, 2, {fixed_rotation = true})
 end
 
 function love.update(dt)
   KB.update()
+  Physics.update(dt)
+
+  print(tostring(man.left) .. "|" .. tostring(man.right) .. "|" .. tostring(man.top) .. "|" .. tostring(man.bottom))
 
   local forces = Vector.new()
   if KB.down("left") then forces.x = -120 end
   if KB.down("right") then forces.x = 120 end
-  if KB.down("up") then forces.y = -1000 end
-  -- if KB.down("down") then speed.y = 120 end
+  if KB.down("up") then
+    if man.bottom then
+      man.body:applyLinearImpulse(0, -500)
+    end
+  end
 
   man:move(forces, objs)
-  Physics.update(dt)
 end
 
 function love.draw()
@@ -34,6 +38,5 @@ function love.draw()
   for _, o in ipairs(objs) do
     love.graphics.polygon("fill", o:points())
   end
-  love.graphics.polygon("fill", other_obj:points())
   man:draw_shape({1, 0, 0})
 end

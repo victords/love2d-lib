@@ -1,5 +1,8 @@
 GameObject = setmetatable({}, Sprite)
 GameObject.__index = GameObject
+GameObject.__tostring = function(obj)
+  return "GameObject (" .. obj.x .. ", " .. obj.y .. ", " .. obj.w .. ", " .. obj.h .. ")"
+end
 
 function GameObject.new(x, y, w, h, img_path, img_gap, cols, rows, physics_options)
   local self = Sprite.new(x, y, img_path, cols, rows)
@@ -23,6 +26,7 @@ function GameObject.new(x, y, w, h, img_path, img_gap, cols, rows, physics_optio
     if physics_options and physics_options.fixed_rotation then
       self.body:setFixedRotation(true)
     end
+    self.body:setUserData(self)
   end
 
   return self
@@ -72,13 +76,8 @@ end
 function GameObject:move(forces, obst, ramps, set_speed)
   if Physics.engine == "love" then
     for _, obj in ipairs(obst) do
-      if not obj.passable or (self.body:getY() + self.h / 2 <= obj.y) then
-        obj.body:setActive(true)
-      end
-    end
-    if ramps then
-      for _, obj in ipairs(ramps) do
-        obj.body:setActive(true)
+      if obj.passable then
+        obj.body:setActive(self.body:getY() + self.h / 2 <= obj.y)
       end
     end
 
@@ -353,10 +352,30 @@ function GameObject:cycle(points, scalar_speed, carried_objs, obstacles, ramps, 
   end
 end
 
+function GameObject:set_contacts(obj, normal_x, normal_y)
+  if normal_x < 0 then
+    self.left = obj
+  elseif normal_x > 0 then
+    self.right = obj
+  end
+  if normal_y < 0 then
+    self.top = obj
+  elseif normal_y > 0 then
+    self.bottom = obj
+  end
+end
+
+function GameObject:clear_contacts(obj)
+  if self.left == obj then self.left = nil end
+  if self.right == obj then self.right = nil end
+  if self.top == obj then self.top = nil end
+  if self.bottom == obj then self.bottom = nil end
+end
+
 -- private
 function GameObject:check_contact(obst, ramps)
   local prev_bottom = self.bottom
-  self.top = nil; self.bottom = nil; self.left = nil; self.right = nil
+  self.left = nil; self.right = nil; self.top = nil; self.bottom = nil
   for _, o in ipairs(obst) do
     local x2 = self.x + self.w
     local y2 = self.y + self.h

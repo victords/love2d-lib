@@ -1,5 +1,8 @@
 Block = {}
 Block.__index = Block
+Block.__tostring = function(b)
+  return "Block (" .. b.x .. ", " .. b.y .. ", " .. b.w .. ", " .. b.h .. ")"
+end
 
 function Block.new(x, y, w, h, passable)
   local self = setmetatable({}, Block)
@@ -14,7 +17,7 @@ function Block.new(x, y, w, h, passable)
     self.body = love.physics.newBody(Physics.world, x + w / 2, y + h / 2)
     self.shape = love.physics.newRectangleShape(w, h)
     love.physics.newFixture(self.body, self.shape)
-    self.body:setActive(false)
+    self.body:setUserData(self)
   end
 
   return self
