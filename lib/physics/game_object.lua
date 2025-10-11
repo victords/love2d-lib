@@ -331,7 +331,6 @@ function GameObject:move_free(aim, scalar_speed)
   else -- aim is a Vector
     local x_d = aim.x - self:get_x()
     local y_d = aim.y - self:get_y()
-    --print(x_d, y_d)
     if math.abs(x_d) < Physics.epsilon and math.abs(y_d) < Physics.epsilon then
       if Physics.engine == "love" then
         self.body:setLinearVelocity(0, 0)
@@ -367,11 +366,11 @@ function GameObject:move_free(aim, scalar_speed)
   end
 end
 
-function GameObject:cycle(points, scalar_speed, carried_objs, obstacles, ramps, stop_time)
+function GameObject:cycle(points, scalar_speed, stop_time, carried_objs, obstacles, ramps)
   stop_time = stop_time or 0
   if not self.cycle_setup then
     self.cur_point = self.cur_point or 1
-    if carried_objs then
+    if carried_objs and Physics.engine == "minigl" then
       obstacles = obstacles or {}
       ramps = ramps or {}
       self:move_carrying(points[self.cur_point], scalar_speed, carried_objs, obstacles, ramps)
@@ -379,7 +378,9 @@ function GameObject:cycle(points, scalar_speed, carried_objs, obstacles, ramps, 
       self:move_free(points[self.cur_point], scalar_speed)
     end
   end
-  if self.speed.x == 0 and self.speed.y == 0 then
+
+  local speed = self:get_speed()
+  if speed.x == 0 and speed.y == 0 then
     if not self.cycle_setup then
       self.cycle_timer = 0
       self.cycle_setup = true
