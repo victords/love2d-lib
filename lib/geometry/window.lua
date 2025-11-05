@@ -69,9 +69,18 @@ function Window.set_shader(path)
 end
 
 function Window.draw_rectangle(x, y, z, w, h, color, mode)
-  color = color or {1, 1, 1}
   mode = mode or "fill"
   add_to_layer(z, {"rectangle", color, mode, x, y, w, h})
+end
+
+function Window.draw_polygon(z, color, mode, ...)
+  mode = mode or "fill"
+  add_to_layer(z, {"polygon", color, mode, ...})
+end
+
+function Window.draw_circle(x, y, z, radius, color, mode)
+  mode = mode or "fill"
+  add_to_layer(z, {"circle", color, mode, x, y, radius})
 end
 
 function Window.draw_image(image, x, y, z, color, scale_x, scale_y, angle, origin_x, origin_y, quad)
