@@ -19,7 +19,6 @@ function Window.init(fullscreen, width, height, reference_width, reference_heigh
   Window.height = height
   Window.reference_width = reference_width
   Window.reference_height = reference_height
-  Window.canvas = love.graphics.newCanvas(reference_width, reference_height)
 
   local screen_width, screen_height
   if fullscreen then
@@ -42,10 +41,16 @@ function Window.init(fullscreen, width, height, reference_width, reference_heigh
     end
     Window.offset_x = math.floor((screen_width - Window.scale * reference_width) / 2)
     Window.offset_y = math.floor((screen_height - Window.scale * reference_height) / 2)
+    Window.canvas = love.graphics.newCanvas(reference_width, reference_height)
   else
     Window.scale = 1
     Window.offset_x = 0
     Window.offset_y = 0
+    if Window.shader then
+      Window.canvas = love.graphics.newCanvas(reference_width, reference_height)
+    else
+      Window.canvas = nil
+    end
   end
 
   love.window.setMode(screen_width, screen_height, { fullscreen = fullscreen })
@@ -58,6 +63,9 @@ end
 
 function Window.set_shader(path)
   Window.shader = Res.shader(path)
+  if Window.canvas == nil then
+    Window.canvas = love.graphics.newCanvas(Window.reference_width, Window.reference_height)
+  end
 end
 
 function Window.draw_rectangle(x, y, z, w, h, color, mode)
@@ -78,8 +86,10 @@ function Window.draw_text(text, font, x, y, z, color, scale_x, scale_y, angle, o
 end
 
 function Window.draw(draw_code)
-  love.graphics.setCanvas(Window.canvas)
-  love.graphics.clear()
+  if Window.canvas then
+    love.graphics.setCanvas(Window.canvas)
+    love.graphics.clear()
+  end
 
   Window.layers = {}
   draw_code()
@@ -100,8 +110,10 @@ function Window.draw(draw_code)
     end
   end
 
-  if Window.shader then love.graphics.setShader(Window.shader) end
-  love.graphics.setCanvas()
-  love.graphics.draw(Window.canvas, Window.offset_x, Window.offset_y, nil, Window.scale, Window.scale)
-  if Window.shader then love.graphics.setShader() end
+  if Window.canvas then
+    if Window.shader then love.graphics.setShader(Window.shader) end
+    love.graphics.setCanvas()
+    love.graphics.draw(Window.canvas, Window.offset_x, Window.offset_y, nil, Window.scale, Window.scale)
+    if Window.shader then love.graphics.setShader() end
+  end
 end
