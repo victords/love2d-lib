@@ -70,7 +70,7 @@ function GameObject:draw_shape(color, z_index)
 end
 
 function GameObject:bounds()
-  return Rectangle.new(self.x, self.y, self.w, self.h)
+  return Rectangle.new(self:get_x(), self:get_y(), self.w, self.h)
 end
 
 function GameObject:get_speed()
@@ -84,7 +84,7 @@ end
 
 function GameObject:get_x()
   if Physics.engine == "love" then
-    return self.body:getX()
+    return self.body:getX() - self.w / 2
   else
     return self.x
   end
@@ -92,17 +92,27 @@ end
 
 function GameObject:get_y()
   if Physics.engine == "love" then
-    return self.body:getY()
+    return self.body:getY() - self.h / 2
   else
     return self.y
   end
 end
 
+function GameObject:get_mass_center()
+  if Physics.engine == "love" then
+    return Vector.new(self.body:getX(), self.body:getY())
+  else
+    return Vector.new(self.x + self.w / 2, self.y + self.h / 2)
+  end
+end
+
 function GameObject:move(forces, obst, ramps, set_speed)
   if Physics.engine == "love" then
-    for _, obj in ipairs(obst) do
-      if obj.passable then
-        obj.body:setActive(self.body:getY() + self.h / 2 <= obj.y)
+    if obst then
+      for _, obj in ipairs(obst) do
+        if obj.passable then
+          obj.body:setActive(self.body:getY() + self.h / 2 <= obj.y)
+        end
       end
     end
 
@@ -411,6 +421,10 @@ function GameObject:clear_contacts(obj)
   if self.right == obj then self.right = nil end
   if self.top == obj then self.top = nil end
   if self.bottom == obj then self.bottom = nil end
+end
+
+function GameObject:is_in_contact_with(obj)
+  return self.left == obj or self.right == obj or self.top == obj or self.bottom == obj
 end
 
 -- private
