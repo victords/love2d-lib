@@ -334,8 +334,9 @@ function GameObject:move_free(aim, scalar_speed)
       self.y = self.y + speed.y
     end
   else -- aim is a Vector
-    local x_d = aim.x - self:get_x()
-    local y_d = aim.y - self:get_y()
+    local center = self:get_mass_center()
+    local x_d = aim.x - center.x
+    local y_d = aim.y - center.y
     if math.abs(x_d) < Physics.epsilon and math.abs(y_d) < Physics.epsilon then
       if Physics.engine == "love" then
         self.body:setLinearVelocity(0, 0)
@@ -425,6 +426,12 @@ end
 
 function GameObject:is_in_contact_with(obj)
   return self.left == obj or self.right == obj or self.top == obj or self.bottom == obj
+end
+
+function GameObject:clean()
+  if self.body then
+    self.body:destroy()
+  end
 end
 
 -- private
